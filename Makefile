@@ -19,4 +19,4 @@ extract: tbontb.epub
 	unzip -d tbontb tbontb.epub
 
 clean:
-	rm -f tbontb.dot tbontb.svgz
+	rm -f tbontb.dot tbontb.svgz tbontb.svg
