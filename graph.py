@@ -63,12 +63,9 @@ class Page:
 
     @property
     def is_ending(self):
-        # judge endings by presence of a single fullscreen image
-        imgs = self._body.select("img.fullscreen")
-        if len(imgs) == 1:
+        if self._body.findAll(text="THE END"):
             return True
-        else:
-            return False
+        return False
 
 
     def choices(self):
@@ -164,17 +161,20 @@ def node_graph(content_dir, nodes):
         attrs = {"href": join(content_dir, node.content_file),
                 "id": node.ident}
         if node.is_ending:
-            height = 7.0
             attrs.update({
                 "color": "purple",
-                "image": join(content_dir, node.ending_image),
-                "fixedsize": "true",
-                "imagescale": "true",
                 "shape": "box",
-                "height": str(height+0.5),
-                "width": str(height/1.5),
-                "labelloc": "b",
                 })
+            if node.ending_image:
+                height = 7.0
+                attrs.update({
+                    "image": join(content_dir, node.ending_image),
+                    "fixedsize": "true",
+                    "imagescale": "true",
+                    "height": str(height+0.5),
+                    "width": str(height/1.5),
+                    "labelloc": "b",
+                    })
         dot.node(node.content_file, node.label, **attrs)
         for link in node.links:
             # Not only are these unnecessary, rendering is about 20x faster without
