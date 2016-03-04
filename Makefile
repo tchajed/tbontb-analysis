@@ -4,7 +4,7 @@ default: tbontb.svg tbontb.json stats.txt
 all: tbontb.json tbontb.svg stats.txt
 
 
-tbontb.dot tbontb.json: graph.py
+tbontb.dot tbontb.json: tbontb/ graph.py
 	./graph.py
 
 tbontb.svgz: tbontb.dot
@@ -13,21 +13,20 @@ tbontb.svgz: tbontb.dot
 tbontb.svg: tbontb.dot
 	dot -Tsvg $< -o $@
 
-stats.txt: graph.py analysis.py
+stats.txt: tbontb/ graph.py analysis.py
 	./analysis.py > $@
-
 
 package: resources.tar.gz
 
 
-resources.tar.gz: tbontb.json tbontb.svg
+resources.tar.gz: tbontb tbontb.json tbontb.svg
 	sh package.sh
 
-extract: tbontb.epub
-	rm -rf tbontb
+tbontb/: tbontb.epub
 	unzip -d tbontb tbontb.epub
 
 clean:
-	rm -f tbontb.dot tbontb.svgz tbontb.svg
+	rm -f tbontb.dot tbontb.svgz tbontb.svg stats.txt
+	rm -rf tbontb
 
 .PHONY: default all package extract clean
