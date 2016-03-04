@@ -191,6 +191,7 @@ def node_graph(content_dir, nodes):
 
 
 if __name__ == "__main__":
-    nodes = read_nodes("tbontb")
-    dot = node_graph(nodes)
+    book_dir = "tbontb"
+    nodes = read_nodes(book_dir)
+    dot = node_graph(book_dir, nodes)
     dot.save("tbontb.dot")
