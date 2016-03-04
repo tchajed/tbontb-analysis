@@ -1,8 +1,8 @@
-default: tbontb.svg stats.txt
+default: tbontb.svg tbontb.json stats.txt
 
-all: tbontb.svg stats.txt
+all: tbontb.json tbontb.svg stats.txt
 
-tbontb.dot: graph.py
+tbontb.dot tbontb.json: graph.py
 	./graph.py
 
 tbontb.svgz: tbontb.dot

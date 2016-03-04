@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-import bs4.element
 from bs4 import BeautifulSoup
 from graphviz import Digraph
 from os.path import join, basename, splitext
-
-
+import json
 
 
 class Link:
@@ -13,7 +11,7 @@ class Link:
         self.text = text
         self.src = src
         self.dst = dst
-        self.implicit = implicit
+        self.is_implicit = implicit
 
     @classmethod
     def implicit(cls, src, dst):
@@ -183,7 +181,7 @@ def node_graph(content_dir, nodes):
             if link.is_restart:
                 continue
             attrs = {}
-            if link.implicit:
+            if link.is_implicit:
                 attrs["color"] = "gray"
             if link.is_shakespeare:
                 attrs["color"] = "red"
@@ -191,8 +189,29 @@ def node_graph(content_dir, nodes):
     return dot
 
 
+def graph_data(nodes):
+    node_lookup = {}
+    for node in nodes:
+        node_lookup[node.content_file] = node
+    info = {}
+    for node in nodes:
+        implicit = None
+        for link in node.links:
+            if link.is_implicit:
+                implicit = node_lookup[link.dst].ident
+        node_info = {
+                "is_ending": node.is_ending,
+                "implicit": implicit,
+                "url": node.content_file,
+                }
+        info[node.ident] = node_info
+    return info
+
+
 if __name__ == "__main__":
     book_dir = "tbontb"
     nodes = read_nodes(book_dir)
     dot = node_graph(book_dir, nodes)
     dot.save("tbontb.dot")
+    with open("tbontb.json", "w") as f:
+        json.dump(graph_data(nodes), f)
