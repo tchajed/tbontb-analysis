@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from graphviz import Digraph
 from os.path import join, basename, splitext
 
-BOOK_DIR = "tbontb"
+
 
 
 class Link:
@@ -35,7 +35,7 @@ class Page:
 
     @classmethod
     def from_file(cls, fname):
-        with open(join(BOOK_DIR, fname)) as f:
+        with open(fname) as f:
             soup = BeautifulSoup(f, "html.parser")
             return cls(fname, soup)
 
@@ -83,7 +83,8 @@ class Page:
 
 
 class Chapter:
-    def __init__(self, navPoint):
+    def __init__(self, content_dir, navPoint):
+        self._dir = content_dir
         self._tag = navPoint
 
     @property
@@ -100,7 +101,7 @@ class Chapter:
         return self._tag.content["src"]
 
     def page(self):
-        return Page.from_file(self.content_file)
+        return Page.from_file(join(self._dir, self.content_file))
 
 
 class Node:
@@ -138,50 +139,58 @@ class Node:
         return self.page.ending_image
 
 
-with open(join(BOOK_DIR, "book.ncx")) as f:
-    soup = BeautifulSoup(f, "xml")
+def read_nodes(content_dir):
+    with open(join(content_dir, "book.ncx")) as f:
+        soup = BeautifulSoup(f, "xml")
+
+    chapters = [Chapter(content_dir, navPoint) for navPoint in soup.ncx.find_all("navPoint")]
+    chapters.sort(key=lambda c: c.order)
+
+    nodes = []
+    for i, chapter in enumerate(chapters):
+        if i == len(chapters) - 1:
+            next_chapter = None
+        else:
+            next_chapter = chapters[i+1]
+        node = Node(chapter, next_chapter)
+        nodes.append(node)
+
+    return nodes
 
 
-chapters = [Chapter(navPoint) for navPoint in soup.ncx.find_all("navPoint")]
-chapters.sort(key=lambda c: c.order)
+def node_graph(content_dir, nodes):
+    dot = Digraph(name="To Be Or Not To Be")
+    for node in nodes:
+        attrs = {"href": join(content_dir, node.content_file),
+                "id": node.ident}
+        if node.is_ending:
+            height = 7.0
+            attrs.update({
+                "color": "purple",
+                "image": join(content_dir, node.ending_image),
+                "fixedsize": "true",
+                "imagescale": "true",
+                "shape": "box",
+                "height": str(height+0.5),
+                "width": str(height/1.5),
+                "labelloc": "b",
+                })
+        dot.node(node.content_file, node.label, **attrs)
+        for link in node.links:
+            # Not only are these unnecessary, rendering is about 20x faster without
+            # them due to layout
+            if link.is_restart:
+                continue
+            attrs = {}
+            if link.implicit:
+                attrs["color"] = "gray"
+            if link.is_shakespeare:
+                attrs["color"] = "red"
+            dot.edge(link.src, link.dst, **attrs)
+    return dot
 
-nodes = []
-for i, chapter in enumerate(chapters):
-    if i == len(chapters) - 1:
-        next_chapter = None
-    else:
-        next_chapter = chapters[i+1]
-    node = Node(chapter, next_chapter)
-    nodes.append(node)
 
-dot = Digraph(name="To Be Or Not To Be")
-
-for node in nodes:
-    attrs = {"href": join(BOOK_DIR, node.content_file),
-            "id": node.ident}
-    if node.is_ending:
-        height = 7.0
-        attrs.update({
-            "color": "purple",
-            "image": join(BOOK_DIR, node.ending_image),
-            "fixedsize": "true",
-            "imagescale": "true",
-            "shape": "box",
-            "height": str(height+0.5),
-            "width": str(height/1.5),
-            "labelloc": "b",
-            })
-    dot.node(node.content_file, node.label, **attrs)
-    for link in node.links:
-        # Not only are these unnecessary, rendering is about 20x faster without
-        # them due to layout
-        if link.is_restart:
-            continue
-        attrs = {}
-        if link.implicit:
-            attrs["color"] = "gray"
-        if link.is_shakespeare:
-            attrs["color"] = "red"
-        dot.edge(link.src, link.dst, **attrs)
-
-dot.save("tbontb.dot")
+if __name__ == "__main__":
+    nodes = read_nodes("tbontb")
+    dot = node_graph(nodes)
+    dot.save("tbontb.dot")
