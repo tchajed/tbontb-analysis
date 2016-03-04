@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 from graph import read_nodes
-from os.path import exists
 from collections import Counter
 import numpy as np
 
+nodes = read_nodes("tbontb")
+
 def stat(name, num):
     print(name + ":", num)
-
-nodes = read_nodes("tbontb")
 
 def get_in_degrees():
     counts = Counter()
