@@ -6,6 +6,12 @@ tbontb.dot: graph.py
 tbontb.svgz: tbontb.dot
 	dot -Tsvgz $< -o $@
 
+svg: tbontb.svg
+
+
+tbontb.svg: tbontb.dot
+	dot -Tsvg $< -o $@
+
 extract: tbontb.epub
 	rm -rf tbontb
 	unzip -d tbontb tbontb.epub
