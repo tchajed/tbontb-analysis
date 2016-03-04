@@ -156,7 +156,8 @@ def read_nodes(content_dir):
 
 
 def node_graph(content_dir, nodes):
-    dot = Digraph(name="To Be Or Not To Be")
+    dot = Digraph(name="To Be Or Not To Be",
+            graph_attr={"id": "viewport"})
     for node in nodes:
         attrs = {"href": join(content_dir, node.content_file),
                 "id": node.ident}
