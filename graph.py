@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
+import bs4.element
 from bs4 import BeautifulSoup
 from graphviz import Digraph
-from os.path import join
-
+from os.path import join, basename, splitext
 
 BOOK_DIR = "tbontb"
 
@@ -120,6 +120,12 @@ class Node:
         return self.chapter.content_file
 
     @property
+    def ident(self):
+        """Return a unique identifier, based on filename."""
+        name, ext = splitext(basename(self.content_file))
+        return name
+
+    @property
     def label(self):
         return self.chapter.label
 
@@ -151,7 +157,8 @@ for i, chapter in enumerate(chapters):
 dot = Digraph(name="To Be Or Not To Be")
 
 for node in nodes:
-    attrs = {"href": join(BOOK_DIR, node.content_file)}
+    attrs = {"href": join(BOOK_DIR, node.content_file),
+            "id": node.ident}
     if node.is_ending:
         height = 7.0
         attrs.update({
