@@ -34,10 +34,10 @@ class Page:
         self._body = soup.find("body")
 
     @classmethod
-    def from_file(cls, fname):
+    def from_file(cls, fname, name):
         with open(fname) as f:
             soup = BeautifulSoup(f, "html.parser")
-            return cls(fname, soup)
+            return cls(name, soup)
 
     @property
     def title(self):
@@ -101,7 +101,7 @@ class Chapter:
         return self._tag.content["src"]
 
     def page(self):
-        return Page.from_file(join(self._dir, self.content_file))
+        return Page.from_file(join(self._dir, self.content_file), self.content_file)
 
 
 class Node:
