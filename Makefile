@@ -1,4 +1,6 @@
-default: tbontb.svgz stats.txt
+default: tbontb.svg stats.txt
+
+all: tbontb.svg stats.txt
 
 tbontb.dot: graph.py
 	./graph.py
@@ -6,13 +8,11 @@ tbontb.dot: graph.py
 tbontb.svgz: tbontb.dot
 	dot -Tsvgz $< -o $@
 
-stats.txt: graph.py analysis.py
-	./analysis.py > $@
-
-svg: tbontb.svg
-
 tbontb.svg: tbontb.dot
 	dot -Tsvg $< -o $@
+
+stats.txt: graph.py analysis.py
+	./analysis.py > $@
 
 extract: tbontb.epub
 	rm -rf tbontb
