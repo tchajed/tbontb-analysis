@@ -70,14 +70,18 @@ stat("reachable endings", len(ending_paths))
 stat("average path to ending", ending_paths.mean())
 stat("std dev path to ending", ending_paths.std())
 
-single_choices = 0
-no_real_choice = 0
-for node, adjacency in adjacency_lists.items():
-    if len(adjacency) == 1 and not node.links[0].is_implicit:
-        single_choices += 1
-    if len(adjacency) > 1:
-        dsts = set([link.dst for link in node.links if not link.is_implicit])
-        if len(dsts) == 1:
-            no_real_choice += 1
-stat("single choices", single_choices)
-stat("not a real choices", no_real_choice)
+def choice_types(adjacency_lists):
+    single = 0
+    not_real = 0
+    for node, adjacency in adjacency_lists.items():
+        if len(adjacency) == 1 and not node.links[0].is_implicit:
+            single += 1
+        if len(adjacency) > 1:
+            dsts = set([link.dst for link in node.links if not link.is_implicit])
+            if len(dsts) == 1:
+                not_real += 1
+    return {"single": single, "not_real": not_real}
+
+choice_counts = choice_types(adjacency_lists)
+stat("single choices", choice_counts["single"])
+stat("not a real choices", choice_counts["not_real"])
