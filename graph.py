@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 from graphviz import Digraph
 from os.path import join, basename, splitext
+import textwrap
 import json
 
 
@@ -172,6 +173,7 @@ def read_nodes(content_dir):
 def node_graph(content_dir, nodes):
     dot = Digraph(name="To Be Or Not To Be",
             graph_attr={"id": "viewport"})
+    wrapper = textwrap.TextWrapper(width=50)
     for node in nodes:
         attrs = {"href": join(content_dir, node.content_file),
                 "id": node.ident}
@@ -190,7 +192,7 @@ def node_graph(content_dir, nodes):
                     "width": str(height/1.5),
                     "labelloc": "b",
                     })
-        dot.node(node.content_file, node.label, **attrs)
+        dot.node(node.content_file, wrapper.fill(node.label), **attrs)
         for link in node.links:
             # Not only are these unnecessary, rendering is about 20x faster without
             # them due to layout

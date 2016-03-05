@@ -1,3 +1,4 @@
 - [ ] traverse Hamlet path and get length
 - [ ] count path lengths as number of decisions
 - [ ] find subgraph a -> c, a -> b -> c.
+- [x] split long SVG labels
