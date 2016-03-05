@@ -108,9 +108,17 @@ class Node:
         self.chapter = chapter
         page = chapter.page()
         links = page.choices()
-        if not links and next_chapter and not page.is_ending:
-            links = [Link.implicit(chapter.content_file,
-                next_chapter.content_file)]
+
+        if next_chapter is not None:
+            this_base, _ = splitext(chapter.content_file)
+            next_base, _ = splitext(next_chapter.content_file)
+
+            if ((not links and not page.is_ending) or
+                    next_base == this_base + "-1"):
+                implicit = Link.implicit(
+                        chapter.content_file,
+                        next_chapter.content_file)
+                links.append(implicit)
 
         self.page = page
         self.links = links
