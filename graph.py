@@ -60,6 +60,10 @@ class Page:
         return img["src"]
 
     @property
+    def is_start(self):
+        return self.name == "start.html"
+
+    @property
     def is_ending(self):
         if self._body.findAll(text="THE END"):
             return True
@@ -124,6 +128,10 @@ class Node:
     @property
     def label(self):
         return self.chapter.label
+
+    @property
+    def is_start(self):
+        return self.page.is_start
 
     @property
     def is_ending(self):
