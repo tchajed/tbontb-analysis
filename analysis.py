@@ -5,6 +5,34 @@ from collections import Counter
 import numpy as np
 
 nodes = read_nodes("tbontb")
+start = [node for node in nodes if node.is_start][0]
+
+def to_adjacency_lists(nodes):
+    node_lookup = {}
+    for node in nodes:
+        node_lookup[node.content_file] = node
+    adjacency_lists = {}
+    for node in nodes:
+        adjacents = [node_lookup[link.dst] for link in node.links]
+        adjacency_lists[node] = adjacents
+    return adjacency_lists
+
+def shortest_paths(adjacency_lists):
+    shortest_path = {}
+    for node in adjacency_lists:
+        shortest_path[node] = len(adjacency_lists)
+    distance = 0
+    queue = [start]
+    while queue:
+        to_add = []
+        for node in queue:
+            if shortest_path[node] <= distance:
+                continue
+            shortest_path[node] = distance
+            to_add.extend(adjacency_lists[node])
+        queue = to_add
+        distance += 1
+    return shortest_path
 
 def stat(name, num):
     print(name + ":", num)
@@ -30,3 +58,26 @@ stat("single-decision nodes", sum(out_degrees == 1))
 stat("unreachable nodes", sum(in_degrees == 0))
 stat("single-entry nodes", sum(in_degrees == 1))
 stat("endings", sum([node.is_ending for node in nodes]))
+
+adjacency_lists = to_adjacency_lists(nodes)
+shortest_path = shortest_paths(adjacency_lists)
+ending_paths = np.array([shortest_path[node] for node in nodes
+    if node.is_ending])
+# filter out "infinity" shortest distances
+ending_paths = ending_paths[ending_paths != len(nodes)]
+
+stat("reachable endings", len(ending_paths))
+stat("average path to ending", ending_paths.mean())
+stat("std dev path to ending", ending_paths.std())
+
+single_choices = 0
+no_real_choice = 0
+for node, adjacency in adjacency_lists.items():
+    if len(adjacency) == 1 and not node.links[0].is_implicit:
+        single_choices += 1
+    if len(adjacency) > 1:
+        dsts = set([link.dst for link in node.links if not link.is_implicit])
+        if len(dsts) == 1:
+            no_real_choice += 1
+stat("single choices", single_choices)
+stat("not a real choices", no_real_choice)
