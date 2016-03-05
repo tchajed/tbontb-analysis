@@ -1,7 +1,7 @@
 default: tbontb.svg tbontb.json stats.txt
 
 
-all: tbontb.json tbontb.svg stats.txt
+all: tbontb.svg tbontb.json stats.txt package
 
 
 tbontb.dot tbontb.json: tbontb/ graph.py
@@ -29,4 +29,4 @@ clean:
 	rm -f tbontb.dot tbontb.svgz tbontb.svg stats.txt
 	rm -rf tbontb
 
-.PHONY: default all package extract clean
+.PHONY: default all package clean
