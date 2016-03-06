@@ -66,7 +66,7 @@ class Page:
 
     @property
     def is_ending(self):
-        if self._body.findAll(text="THE END"):
+        if self._body.find(text=["» Restart? «", "THE END", "THE END."]):
             return True
         return False
 
