@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from graph import read_nodes
-from collections import Counter
+from collections import Counter, defaultdict
 import numpy as np
 
 nodes = read_nodes("tbontb")
@@ -16,6 +16,13 @@ def to_adjacency_lists(nodes):
         adjacents = [node_lookup[link.dst] for link in node.links]
         adjacency_lists[node] = adjacents
     return adjacency_lists
+
+def reverse_adjacency(adjacency_lists):
+    reverse_lists = defaultdict(list)
+    for src, adjacents in adjacency_lists.items():
+        for dst in adjacents:
+            reverse_lists[dst].append(src)
+    return dict( (k, v) for (k, v) in reverse_lists.items() )
 
 def shortest_paths(adjacency_lists):
     path = {}
