@@ -173,7 +173,7 @@ def read_nodes(content_dir):
 def node_graph(content_dir, nodes):
     dot = Digraph(name="To Be Or Not To Be",
             graph_attr={"id": "viewport"})
-    wrapper = textwrap.TextWrapper(width=50)
+    wrapper = textwrap.TextWrapper(width=48)
     for node in nodes:
         attrs = {"href": join(content_dir, node.content_file),
                 "id": node.ident}
@@ -183,7 +183,7 @@ def node_graph(content_dir, nodes):
                 "shape": "box",
                 })
             if node.ending_image:
-                height = 7.0
+                height = 6.0
                 attrs.update({
                     "image": join(content_dir, node.ending_image),
                     "fixedsize": "true",
