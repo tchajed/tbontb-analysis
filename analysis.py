@@ -18,21 +18,33 @@ def to_adjacency_lists(nodes):
     return adjacency_lists
 
 def shortest_paths(adjacency_lists):
-    shortest_path = {}
+    path = {}
+    path_len = {}
     for node in adjacency_lists:
-        shortest_path[node] = len(adjacency_lists)
+        path_len[node] = len(adjacency_lists)
+        path[node] = None
     distance = 0
-    queue = [start]
+    queue = [([], start)]
     while queue:
+        to_add_nodes = set([])
         to_add = []
-        for node in queue:
-            if shortest_path[node] <= distance:
+        for path_prefix, node in queue:
+            if path_len[node] <= distance:
                 continue
-            shortest_path[node] = distance
-            to_add.extend(adjacency_lists[node])
+            path_len[node] = distance
+            # distance == len(path[node])
+            # (eg, 0 for start)
+            path[node] = path_prefix
+            # new nodes will be reached through path_prefix, node, then a link
+            # out of node
+            prefix = path_prefix + [node]
+            for n in adjacency_lists[node]:
+                if not n in to_add_nodes:
+                    to_add_nodes.add(n)
+                    to_add.append( (prefix, n) )
         queue = to_add
         distance += 1
-    return shortest_path
+    return path
 
 def stat(name, num):
     print(name + ":", num)
@@ -60,15 +72,17 @@ stat("single-entry nodes", sum(in_degrees == 1))
 stat("endings", sum([node.is_ending for node in nodes]))
 
 adjacency_lists = to_adjacency_lists(nodes)
-shortest_path = shortest_paths(adjacency_lists)
-ending_paths = np.array([shortest_path[node] for node in nodes
-    if node.is_ending])
-# filter out "infinity" shortest distances
-ending_paths = ending_paths[ending_paths != len(nodes)]
+shortest_paths = shortest_paths(adjacency_lists)
 
+ending_paths = [path
+    for (node, path) in shortest_paths.items()
+    if path is not None
+    and node.is_ending]
 stat("reachable endings", len(ending_paths))
-stat("average path to ending", ending_paths.mean())
-stat("std dev path to ending", ending_paths.std())
+
+ending_path_lens = np.array([len(path) for path in ending_paths])
+stat("average path to ending", ending_path_lens.mean())
+stat("std dev path to ending", ending_path_lens.std())
 
 def choice_types(adjacency_lists):
     single = 0
