@@ -80,9 +80,17 @@ ending_paths = [path
     and node.is_ending]
 stat("reachable endings", len(ending_paths))
 
+# measure length by pages
 ending_path_lens = np.array([len(path) for path in ending_paths])
 stat("average path to ending", ending_path_lens.mean())
 stat("std dev path to ending", ending_path_lens.std())
+
+# measure length by decisions
+ending_path_decisions = np.array([
+    sum([1 for node in path if len(node.links) > 1])
+    for path in ending_paths])
+stat("average decisions to ending", ending_path_decisions.mean())
+stat("std dev decisions to ending", ending_path_decisions.std())
 
 def choice_types(adjacency_lists):
     single = 0
