@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from graph import read_nodes
+from graph import read_nodes, Node
 from collections import Counter, defaultdict
 import numpy as np
 
@@ -115,3 +115,19 @@ def choice_types(adjacency_lists):
 choice_counts = choice_types(adjacency_lists)
 stat("single choices", choice_counts["single"])
 stat("not a real choices", choice_counts["not_real"])
+
+# Analyze original Hamlet subgraph
+hamlet_nodes = []
+for node in nodes:
+    if len(node.links) == 1:
+        links = node.links
+    else:
+        links = [link for link in node.links
+                if link.is_shakespeare or link.is_implicit]
+    hamlet_nodes.append(Node(node.chapter, node.page, links))
+hamlet_start = [node for node in hamlet_nodes if node.is_start][0]
+hamlet_paths = shortest_paths(hamlet_start,
+        to_adjacency_lists(hamlet_nodes),
+        include_unreachable=False)
+ending_path = max(hamlet_paths.values(), key=len)
+stat("Shakespeare path len", len(ending_path))
