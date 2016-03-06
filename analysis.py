@@ -4,9 +4,6 @@ from graph import read_nodes
 from collections import Counter, defaultdict
 import numpy as np
 
-nodes = read_nodes("tbontb")
-start = [node for node in nodes if node.is_start][0]
-
 def to_adjacency_lists(nodes):
     node_lookup = {}
     for node in nodes:
@@ -24,12 +21,13 @@ def reverse_adjacency(adjacency_lists):
             reverse_lists[dst].append(src)
     return dict( (k, v) for (k, v) in reverse_lists.items() )
 
-def shortest_paths(adjacency_lists):
+def shortest_paths(start, adjacency_lists, include_unreachable=True):
     path = {}
     path_len = {}
     for node in adjacency_lists:
         path_len[node] = len(adjacency_lists)
-        path[node] = None
+        if include_unreachable:
+            path[node] = None
     distance = 0
     queue = [([], start)]
     while queue:
@@ -56,7 +54,7 @@ def shortest_paths(adjacency_lists):
 def stat(name, num):
     print(name + ":", num)
 
-def get_in_degrees():
+def get_in_degrees(nodes):
     counts = Counter()
     for node in nodes:
         for link in node.links:
@@ -66,10 +64,13 @@ def get_in_degrees():
         in_degrees.append(counts[node.content_file])
     return np.array(in_degrees)
 
+nodes = read_nodes("tbontb")
+start = [node for node in nodes if node.is_start][0]
+
 stat("nodes", len(nodes))
 
 out_degrees = np.array([len(node.links) for node in nodes])
-in_degrees = get_in_degrees()
+in_degrees = get_in_degrees(nodes)
 
 stat("links", sum(out_degrees))
 stat("zero-decision nodes", sum(out_degrees == 1))
@@ -79,10 +80,10 @@ stat("single-entry nodes", sum(in_degrees == 1))
 stat("endings", sum([node.is_ending for node in nodes]))
 
 adjacency_lists = to_adjacency_lists(nodes)
-shortest_paths = shortest_paths(adjacency_lists)
+paths = shortest_paths(start, adjacency_lists)
 
 ending_paths = [path
-    for (node, path) in shortest_paths.items()
+    for (node, path) in paths.items()
     if path is not None
     and node.is_ending]
 stat("reachable endings", len(ending_paths))
