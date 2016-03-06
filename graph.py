@@ -105,8 +105,13 @@ class Chapter:
 
 
 class Node:
-    def __init__(self, chapter, next_chapter):
+    def __init__(self, chapter, page, links):
         self.chapter = chapter
+        self.page = page
+        self.links = links
+
+    @classmethod
+    def from_chapters(cls, chapter, next_chapter):
         page = chapter.page()
         links = page.choices()
 
@@ -121,8 +126,7 @@ class Node:
                         next_chapter.content_file)
                 links.append(implicit)
 
-        self.page = page
-        self.links = links
+        return cls(chapter, page, links)
 
     @property
     def content_file(self):
@@ -164,7 +168,7 @@ def read_nodes(content_dir):
             next_chapter = None
         else:
             next_chapter = chapters[i+1]
-        node = Node(chapter, next_chapter)
+        node = Node.from_chapters(chapter, next_chapter)
         nodes.append(node)
 
     return nodes
