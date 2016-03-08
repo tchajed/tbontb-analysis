@@ -119,8 +119,7 @@ class Node:
             this_base, _ = splitext(chapter.content_file)
             next_base, _ = splitext(next_chapter.content_file)
 
-            if ((not links and not page.is_ending) or
-                    next_base == this_base + "-1"):
+            if not page._body.find("hr", class_="bottom"):
                 implicit = Link.implicit(
                         chapter.content_file,
                         next_chapter.content_file)
