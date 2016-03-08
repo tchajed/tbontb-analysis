@@ -73,7 +73,7 @@ out_degrees = np.array([len(node.links) for node in nodes])
 in_degrees = get_in_degrees(nodes)
 
 stat("links", sum(out_degrees))
-stat("zero-decision nodes", sum(out_degrees == 1))
+stat("zero-decision nodes", sum(out_degrees == 0))
 stat("single-decision nodes", sum(out_degrees == 1))
 stat("root nodes", sum(in_degrees == 0))
 stat("single-entry nodes", sum(in_degrees == 1))
