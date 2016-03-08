@@ -75,12 +75,15 @@ in_degrees = get_in_degrees(nodes)
 stat("links", sum(out_degrees))
 stat("zero-decision nodes", sum(out_degrees == 1))
 stat("single-decision nodes", sum(out_degrees == 1))
-stat("unreachable nodes", sum(in_degrees == 0))
+stat("root nodes", sum(in_degrees == 0))
 stat("single-entry nodes", sum(in_degrees == 1))
 stat("endings", sum([node.is_ending for node in nodes]))
 
 adjacency_lists = to_adjacency_lists(nodes)
 paths = shortest_paths(start, adjacency_lists)
+
+stat("unreachable nodes", sum([1 for path in paths.values()
+    if path is None]))
 
 ending_paths = [path
     for (node, path) in paths.items()
