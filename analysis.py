@@ -52,6 +52,7 @@ def shortest_paths(start, adjacency_lists, include_unreachable=True):
     return path
 
 def stat(name, num):
+    name = name.replace(" ", "-")
     print(name + ":", num)
 
 def get_in_degrees(nodes):
