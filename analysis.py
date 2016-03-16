@@ -72,10 +72,18 @@ start = [node for node in nodes if node.is_start][0]
 
 stat("nodes", len(nodes))
 
+non_implicit_nodes = [node for node in nodes
+        if not all([link.is_implicit for link in node.links])]
+
+stat("non-implicit nodes", len(non_implicit_nodes))
+
 out_degrees = np.array([len(node.links) for node in nodes])
 in_degrees = get_in_degrees(nodes)
 
 stat("links", sum(out_degrees))
+mean_degree = sum(out_degrees)/len(non_implicit_nodes)
+stat("mean non-implicit out-degree", mean_degree)
+stat("mean non-implicit out-degree round", round(mean_degree, 1))
 stat("zero-decision nodes", sum(out_degrees == 0))
 stat("single-decision nodes", sum(out_degrees == 1))
 stat("root nodes", sum(in_degrees == 0))
