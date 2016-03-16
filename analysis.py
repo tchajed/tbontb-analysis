@@ -54,6 +54,8 @@ def shortest_paths(start, adjacency_lists, include_unreachable=True):
 def stat(name, num):
     name = name.replace(" ", "-")
     print(name + ":", num)
+    if isinstance(num, float):
+        stat(name + "-int", int(round(num)))
 
 def get_in_degrees(nodes):
     counts = Counter()
