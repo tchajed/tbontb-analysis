@@ -175,11 +175,22 @@ def read_nodes(content_dir):
 
 def node_graph(content_dir, nodes):
     dot = Digraph(name="To Be Or Not To Be",
-            graph_attr={"id": "viewport"})
+            graph_attr={
+                "id": "viewport",
+                "bgcolor": "#333333",
+                },
+            node_attr={
+                "style": "filled",
+                "fillcolor": "white",
+                },
+            edge_attr={"color": "white",
+                "penwidth": "1.7"})
     wrapper = textwrap.TextWrapper(width=48)
     for node in nodes:
-        attrs = {"href": join(content_dir, node.content_file),
-                "id": node.ident}
+        attrs = {
+                "href": join(content_dir, node.content_file),
+                "id": node.ident
+                }
         if node.is_ending:
             attrs.update({
                 "color": "purple",
@@ -203,9 +214,10 @@ def node_graph(content_dir, nodes):
                 continue
             attrs = {}
             if link.is_implicit:
-                attrs["color"] = "gray"
+                attrs["color"] = "#C0C0C0"
+                attrs["penwidth"] = "1.0"
             if link.is_shakespeare:
-                attrs["color"] = "red"
+                attrs["color"] = "#99FF9F"
             dot.edge(link.src, link.dst, **attrs)
     return dot
 
